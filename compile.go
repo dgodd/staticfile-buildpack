@@ -13,14 +13,31 @@ import (
 	bp "github.com/cloudfoundry/libbuildpack"
 )
 
-func main() {
-	bp_dir := os.Getenv("BUILDPACK_DIR")
-	build_dir := os.Args[1]
-	// cache_dir := os.Args[2]
+type IManifest interface {
+	DefaultVersion(depName string) (bp.Dependency, error)
+	FetchDependency(dep bp.Dependency, outputFile string) error
+}
 
-	config, err := getConfig(build_dir)
+func main() {
+	build_dir := os.Args[1]
+	cache_dir := os.Args[2]
+
+	bp_dir := os.Getenv("BUILDPACK_DIR")
+	manifest, err := bp.NewManifest(filepath.Join(bp_dir, "manifest.yml"))
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	err = Compile(build_dir, cache_dir, manifest, bp_dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Compile(build_dir, cache_dir string, manifest IManifest, bp_dir string) error {
+	config, err := getConfig(build_dir)
+	if err != nil {
+		return err
 	}
 
 	if len(config["root"]) == 0 {
@@ -28,44 +45,43 @@ func main() {
 		config["root"] = "../public"
 	}
 
-	manifest, _ := bp.NewManifest(filepath.Join(bp_dir, "manifest.yml"))
 	nginx, err := manifest.DefaultVersion("nginx")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = manifest.FetchDependency(nginx, "/tmp/nginx.tgz")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = bp.ExtractTarGz("/tmp/nginx.tgz", build_dir)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	// FIXME: Extract should do this
 	err = os.Chmod(filepath.Join(build_dir, "nginx", "sbin", "nginx"), 0755)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	conf_dir := filepath.Join(build_dir, "nginx", "conf")
 	err = os.MkdirAll(conf_dir, 0755)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	tmpl := template.Must(template.ParseGlob(filepath.Join(bp_dir, "conf", "nginx.conf")))
-	fh, err := os.Create(filepath.Join(conf_dir, "nginx.conf.template"))
+	fh, err := os.Create(filepath.Join(conf_dir, "nginx.conf"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = tmpl.Execute(fh, config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = Copy(filepath.Join(conf_dir, "mime.types"), filepath.Join(bp_dir, "conf", "mime.types"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = ioutil.WriteFile(filepath.Join(build_dir, "nginx", "sbin", "setup.sh"), []byte(`#!/usr/bin/env bash
@@ -76,12 +92,14 @@ sed "s/__PORT__/$PORT/" < ./nginx/conf/nginx.conf.template > ./nginx/conf/nginx.
 ./nginx/sbin/nginx -p ./nginx/ -c conf/nginx.conf
 	`), 0755)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = os.Chmod(filepath.Join(build_dir, "nginx", "sbin", "setup.sh"), 0755)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 func Copy(dst, src string) error {
