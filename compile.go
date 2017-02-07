@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -35,6 +36,11 @@ func main() {
 }
 
 func Compile(build_dir, cache_dir string, manifest IManifest, bp_dir string) error {
+	bpVersion, err := ioutil.ReadFile("./VERSION")
+	if err != nil {
+		fmt.Printf("Buildpack version %s\n", bpVersion)
+	}
+
 	config, err := getConfig(build_dir)
 	if err != nil {
 		return err
@@ -70,7 +76,7 @@ func Compile(build_dir, cache_dir string, manifest IManifest, bp_dir string) err
 	}
 
 	tmpl := template.Must(template.ParseGlob(filepath.Join(bp_dir, "conf", "nginx.conf")))
-	fh, err := os.Create(filepath.Join(conf_dir, "nginx.conf"))
+	fh, err := os.Create(filepath.Join(conf_dir, "nginx.conf.template"))
 	if err != nil {
 		return err
 	}

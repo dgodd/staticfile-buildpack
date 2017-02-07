@@ -59,7 +59,7 @@ var _ = Describe("Compile", func() {
 			err := main.Compile(buildDir, cacheDir, mockManifest, ".")
 			Expect(err).ToNot(HaveOccurred())
 
-			file, err := ioutil.ReadFile(filepath.Join(buildDir, "nginx", "conf", "nginx.conf"))
+			file, err := ioutil.ReadFile(filepath.Join(buildDir, "nginx", "conf", "nginx.conf.template"))
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(string(file)).To(ContainSubstring("root ../public"))
