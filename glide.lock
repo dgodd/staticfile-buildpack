@@ -1,8 +1,0 @@
-hash: 2454530664e3e5ba4c0a676e9a2553daca561dbceb07598ed13998718d27dfcb
-updated: 2017-02-06T18:43:02.298149343-05:00
-imports:
-- name: github.com/cloudfoundry/libbuildpack
-  version: cf7b4d1059e0cc712e1fda1f5755c6b61f0dccb3
-- name: gopkg.in/yaml.v2
-  version: 4c78c975fe7c825c6d1466c42be594d1d6f3aba6
-testImports: []

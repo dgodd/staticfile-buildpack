@@ -1,0 +1,29 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/cloudfoundry/libbuildpack",
+			"repository": "https://github.com/cloudfoundry/libbuildpack",
+			"vcs": "git",
+			"revision": "cf7b4d1059e0cc712e1fda1f5755c6b61f0dccb3",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/google/uuid",
+			"repository": "https://github.com/google/uuid",
+			"vcs": "git",
+			"revision": "064e2069ce9c359c118179501254f67d7d37ba24",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/yaml.v2",
+			"repository": "https://gopkg.in/yaml.v2",
+			"vcs": "git",
+			"revision": "4c78c975fe7c825c6d1466c42be594d1d6f3aba6",
+			"branch": "v2",
+			"notests": true
+		}
+	]
+}

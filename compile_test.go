@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	main "."
 	bp "github.com/cloudfoundry/libbuildpack"
+	main "github.com/dgodd/staticfile-buildpack"
 
 	"io/ioutil"
 

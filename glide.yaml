@@ -1,4 +1,0 @@
-package: .
-import:
-- package: github.com/cloudfoundry/libbuildpack
-- package: gopkg.in/yaml.v2
